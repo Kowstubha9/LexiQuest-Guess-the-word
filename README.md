@@ -44,7 +44,7 @@ Follow these steps to set up the LexiQuest server on your local machine.
 Clone the repository and activate the virtual environment
 
 ### 2. Install Dependencies
-Install all required packages from requirements.txt:
+Install all required packages from requirements.txt
 
 ### 3. Configure Database
 Create Database: Log into your MySQL client and create the database specified in lexiquest_app/config.py (default: guessgame).
@@ -54,9 +54,7 @@ Update Connection: Ensure your database credentials are correct in lexiquest_app
 Running the application for the first time will automatically create the necessary tables and seed the initial 20 words via db.create_all().
 
 ### 5. Run the Application
-Set the mysql password and port number(if not default)
-
+Set the mysql password and port number(if not default).
 Execute the startup script from the project root using below command:
-
 python run.py
 
