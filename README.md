@@ -54,6 +54,7 @@ Update Connection: Ensure your database credentials are correct in lexiquest_app
 Running the application for the first time will automatically create the necessary tables and seed the initial 20 words via db.create_all().
 
 ### 5. Run the Application
+Set the mysql password and port number(if not default)
 Execute the startup script from the project root using below command:
 python run.py
 
