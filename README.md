@@ -48,6 +48,7 @@ Install all required packages from requirements.txt
 
 ### 3. Configure Database
 Create Database: Log into your MySQL client and create the database specified in lexiquest_app/config.py (default: guessgame).
+
 Update Connection: Ensure your database credentials are correct in lexiquest_app/config.py. 
 
 ### 4. Initialize Tables and Seed Data
