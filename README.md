@@ -55,6 +55,8 @@ Running the application for the first time will automatically create the necessa
 
 ### 5. Run the Application
 Set the mysql password and port number(if not default)
+
 Execute the startup script from the project root using below command:
+
 python run.py
 
