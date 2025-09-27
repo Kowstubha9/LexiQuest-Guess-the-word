@@ -48,5 +48,5 @@ git clone [YOUR_REPOSITORY_URL]
 cd lexiquest
 
 # Create and activate the virtual environment
-python3 -m venv venv
-source venv/bin/activate
+python -m venv venv
+venv\Scripts\activate
