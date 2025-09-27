@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block body_scripts %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Access the Treasure Map</h2>
+    <p class="caption" style="margin-bottom: 20px;">
+        Guess the hidden word to claim the legendary LexiQuest treasure.
+    </p>
+
+    <div id="login-section">
+        <h3>Log In</h3>
+        <form id="login-form">
+            <input type="text" id="login-username" placeholder="Username (e.g., adventurer1)" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+        <p style="margin-top: 15px;">New Adventurer? 
+            <a href="#" id="show-register" style="color: var(--color-antique-gold); font-weight: bold;">Register Here</a>
+        </p>
+    </div>
+
+    <div id="register-section" style="display: none;">
+        <h3>Register New Adventurer</h3>
+        <form id="register-form">
+            <input type="text" id="register-username" placeholder="Username (Min 5 letters)" required>
+            <input type="password" id="register-password" placeholder="Password (Min 5 chars, Alpha, Num, $, %, *, or @)" required>
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+        <p style="margin-top: 15px;">Already have an account? 
+            <a href="#" id="show-login" style="color: var(--color-antique-gold); font-weight: bold;">Log In</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

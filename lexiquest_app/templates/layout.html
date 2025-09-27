@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiQuest - The Word Puzzle</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    {% block head_scripts %}{% endblock %}
+</head>
+<body>
+    <header id="main-header">
+        <h1>
+            <span class="treasure-icon">📦</span>
+            LexiQuest
+        </h1>
+        <nav>
+            {% if session.get('username') %}
+                <span class="user-info">
+                    <i class="fa-solid fa-user" style="margin-right: 5px;"></i> 
+                    Logged in as: {{ session['username'] }}
+                </span>
+                <button id="logout-button" class="btn btn-dark">Logout</button>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main id="content">
+        <div id="message-area" class="alert-box"></div>
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer id="main-footer">
+        <p>&copy; 2025 LexiQuest | A Word Quest Adventure</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    {% block body_scripts %}{% endblock %}
+</body>
+</html>

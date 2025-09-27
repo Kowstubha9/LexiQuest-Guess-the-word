@@ -1,0 +1,18 @@
+# Virtual Environment 
+venv/
+.venv/
+
+# Compiled Python Files 
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs and Database Files 
+*.log
+*.sqlite3
+
+# Ignore local database files 
+*.db
+
+# Sensitive Local Configuration 
+.env

@@ -1,0 +1,183 @@
+/* --- Reset and Theme Colors --- */
+:root {
+    --color-parchment: #F5E8C7;
+    --color-dark-wood: #4A413A;
+    --color-antique-gold: #C79143;
+    --color-text-light: #F0F0F0;
+    
+    /* Game Colors */
+    --color-green: #6AAA64;
+    --color-orange: #C9B458;
+    --color-grey: #787C7E;
+    --color-light-grey: #D8D8D8;
+    
+    --word-length: 5;
+    --guess-limit: 5;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Georgia', serif; 
+}
+
+body {
+    background-color: var(--color-parchment);
+    color: var(--color-dark-wood);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Header and Footer --- */
+
+#main-header {
+    background-color: var(--color-dark-wood);
+    color: var(--color-text-light);
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--color-antique-gold);
+}
+
+#main-header h1 {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: var(--color-antique-gold);
+}
+
+.treasure-icon {
+    font-size: 1.2em;
+    margin-right: 10px;
+}
+
+#main-footer {
+    margin-top: auto; 
+    padding: 10px;
+    text-align: center;
+    background-color: var(--color-dark-wood);
+    color: var(--color-light-grey);
+    font-size: 0.8em;
+}
+
+/* --- General Components --- */
+
+#content {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 1000px; 
+    margin: 0 auto;
+}
+
+.form-container, .game-container, .admin-container {
+    background-color: #FFFDF0; 
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 5px double var(--color-antique-gold);
+    width: 90%;
+    max-width: 400px;
+    margin-top: 50px;
+    text-align: center;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid var(--color-antique-gold);
+    background-color: var(--color-parchment);
+    color: var(--color-dark-wood);
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: var(--color-antique-gold);
+    color: var(--color-dark-wood);
+    border: 2px solid var(--color-dark-wood);
+}
+.btn-primary:hover {
+    background-color: #DDAA55;
+}
+.btn-dark {
+    background-color: var(--color-dark-wood);
+    color: var(--color-text-light);
+    border: 2px solid var(--color-antique-gold);
+}
+.btn-dark:hover {
+    background-color: #38312B;
+}
+
+/* Alert/Message styling */
+#message-area {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 4px;
+    color: var(--color-dark-wood);
+    text-align: center;
+    min-height: 20px;
+}
+.alert-success { background-color: #D4EDDA; border: 1px solid #C3E6CB; }
+.alert-error { background-color: #F8D7DA; border: 1px solid #F5C6CB; }
+
+/* --- Game Grid Styling (Used in game.html) --- */
+
+.word-grid {
+    display: grid;
+    grid-template-rows: repeat(var(--guess-limit), 1fr);
+    gap: 5px;
+    width: calc(var(--word-length) * 55px + 4 * 5px); /* Calculate grid width */
+    margin: 20px auto;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: repeat(var(--word-length), 1fr);
+    gap: 5px;
+}
+
+.letter-tile {
+    width: 50px;
+    height: 50px;
+    border: 2px solid var(--color-light-grey);
+    font-size: 2em;
+    font-weight: bold;
+    color: var(--color-dark-wood);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: uppercase;
+}
+
+/* Game Feedback Colors */
+.tile-green {
+    background-color: var(--color-green);
+    border-color: var(--color-green);
+    color: white;
+}
+.tile-orange {
+    background-color: var(--color-orange);
+    border-color: var(--color-orange);
+    color: white;
+}
+.tile-grey {
+    background-color: var(--color-grey);
+    border-color: var(--color-grey);
+    color: white;
+}

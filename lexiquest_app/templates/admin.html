@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+
+{% block body_scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="admin-container" style="max-width: 800px; width: 90%;">
+    <h2>Admin Chamber: LexiQuest Reports</h2>
+    <p>Welcome, Admin {{ session['username'] }}. Analyze the game metrics below.</p>
+
+    <div style="margin-top: 30px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
+        <h3>Daily Game Summary</h3>
+        <p style="margin-bottom: 10px;">Select a date to view overall game statistics.</p>
+
+        <form id="daily-report-form">
+            <label for="report-date" style="font-weight: bold;">Select Date:</label>
+            <input type="date" id="report-date" required
+                   style="width: auto; margin-right: 15px;">
+            <button type="submit" class="btn btn-dark">Generate Daily Report</button>
+        </form>
+
+        <div id="daily-report-results" style="margin-top: 20px;">
+            <p>Report Date: <span id="daily-date-display" style="font-weight: bold;">--</span></p>
+            <p>Unique Players: <span id="daily-players-count">0</span></p>
+            <p>Total Correct Guesses (Wins): <span id="daily-wins-count">0</span></p>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
+        <h3>Player Performance Tracker (Detailed)</h3>
+        <p style="margin-bottom: 10px;">Enter a player's username to view their history.</p>
+
+        <form id="user-report-form">
+            <label for="user-search" style="font-weight: bold;">Username:</label>
+            <input type="text" id="user-search" placeholder="e.g., adventurer1" required
+                   style="width: 200px; margin-right: 15px; text-transform: lowercase;">
+            <button type="submit" class="btn btn-dark">Search User History</button>
+        </form>
+
+        <div id="user-report-results" style="margin-top: 20px;">
+            <h4 id="user-report-username" style="margin-bottom: 15px;">--</h4>
+            <table id="user-history-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: var(--color-antique-gold); color: var(--color-dark-wood);">
+                        <th style="padding: 8px; border: 1px solid var(--color-dark-wood);">Date</th>
+                        <th style="padding: 8px; border: 1px solid var(--color-dark-wood);">Words Tried</th>
+                        <th style="padding: 8px; border: 1px solid var(--color-dark-wood);">Correct Guesses</th>
+                    </tr>
+                </thead>
+                <tbody id="user-history-body">
+                    <tr id="user-report-placeholder"><td colspan="3" style="text-align: center; padding: 10px;">Enter a username above to view history.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div style="margin-top: 30px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
+        <h3>Global Player Rankings</h3>
+        <p style="margin-bottom: 15px;">View total performance metrics for all players.</p>
+
+        <button id="all-users-report-button" class="btn btn-primary">Generate All Player Report</button>
+        
+        <div id="all-users-report-results" style="margin-top: 20px;">
+            <table id="all-users-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background-color: var(--color-dark-wood); color: var(--color-text-light);">
+                        <th style="padding: 8px; border: 1px solid var(--color-antique-gold);">Player</th>
+                        <th style="padding: 8px; border: 1px solid var(--color-antique-gold);">Total Games</th>
+                        <th style="padding: 8px; border: 1px solid var(--color-antique-gold);">Total Wins</th>
+                    </tr>
+                </thead>
+                <tbody id="all-users-body">
+                    <tr id="all-users-placeholder"><td colspan="3" style="text-align: center; padding: 10px;">Click the button above to load the player rankings.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

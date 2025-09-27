@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block body_scripts %}
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <h2>The Deciphering Chamber</h2>
+
+    <div id="game-info" style="margin-bottom: 20px;">
+        <p id="current-user">Player: {{ session['username'] }}</p>
+        <p id="game-status-message" style="font-weight: bold; color: var(--color-dark-wood); min-height: 20px;">
+            Ready to start your quest.
+        </p>
+    </div>
+
+    <div id="game-start-area">
+        <button id="start-game-button" class="btn btn-primary">Start New Quest (Word)</button>
+        <p style="margin-top: 10px; font-size: 0.9em;">You can guess a maximum of 3 words per day.</p>
+        <p style="margin-top: 10px; font-size: 0.9em;">
+            You have <span id="daily-words-left">3</span> words remaining today.
+        </p>
+    </div>
+
+    <div id="active-game-area" style="display: none;">
+        
+        <div id="word-grid-display" class="word-grid">
+            </div>
+
+        <form id="guess-form" style="margin-top: 30px;">
+            <input type="text" 
+                   id="guess-input" 
+                   maxlength="5" 
+                   placeholder="Enter 5-letter word (A-Z)" 
+                   required
+                   style="text-transform: uppercase;">
+            <button type="submit" id="submit-guess-button" class="btn btn-dark" disabled>Submit Guess</button>
+        </form>
+
+        <p id="guesses-remaining-display" style="margin-top: 10px; font-style: italic;">
+            Guesses remaining: <span id="guesses-count">5</span>
+        </p>
+    </div>
+    
+    <div id="game-end-controls" style="margin-top: 20px; display: none;">
+        <button id="play-again-button" class="btn btn-primary">Play Another Word</button>
+    </div>
+
+</div>
+{% endblock %}
