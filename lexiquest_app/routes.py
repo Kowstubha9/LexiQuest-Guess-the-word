@@ -10,7 +10,7 @@ import json
 
 bp = Blueprint('main', __name__)
 
-# Helper Functions 
+# Helper Functions (Authentication and Limit)
 
 def login_required(f):
     """Decorator to check if a user is logged in."""
@@ -35,17 +35,19 @@ def admin_required(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
+# Helper function to calculate games played today 
+def get_games_played_today(user_id):
+    today = date.today()
+    return Game.query.filter(
+        Game.user_id == user_id,
+        Game.date_played == today
+    ).count()
+
 def check_daily_limit(f):
     """Decorator to enforce the max 3 games per user per day limit."""
     @login_required
     def wrapper(*args, **kwargs):
-        user_id = session['user_id']
-        today = date.today()
-        
-        games_played_today = Game.query.filter(
-            Game.user_id == user_id,
-            Game.date_played == today
-        ).count()
+        games_played_today = get_games_played_today(session['user_id'])
         
         if games_played_today >= Config.MAX_WORDS_PER_DAY:
             return jsonify({
@@ -56,7 +58,7 @@ def check_daily_limit(f):
     wrapper.__name__ = f.__name__
     return wrapper
 
-# Root Route (Landing Page)
+# HTML Page Routes 
 @bp.route('/', methods=['GET'])
 def index():
     """Renders the welcome/login/registration page."""
@@ -67,7 +69,6 @@ def index():
         
     return render_template('index.html', message="Welcome to LexiQuest!")
 
-# Player Game Page
 @bp.route('/game', methods=['GET'])
 @login_required
 def game_page():
@@ -76,7 +77,6 @@ def game_page():
         return redirect(url_for('main.admin_dashboard'))
     return render_template('game.html')
 
-# Admin Dashboard Page
 @bp.route('/admin', methods=['GET'])
 @admin_required
 def admin_dashboard():
@@ -84,14 +84,12 @@ def admin_dashboard():
     return render_template('admin.html')
 
 # User Authentication API Routes 
-# Registration Route
 @bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
     
-    # Validation Checks
     if not username or not password:
         return jsonify({'message': 'Username and password are required.'}), 400
 
@@ -99,15 +97,11 @@ def register():
         return jsonify({'message': f'Username must be at least {Config.MIN_USERNAME_LENGTH} letters.'}), 400
         
     if not is_valid_password(password):
-        return jsonify({
-            'message': 'Password is too weak. It must be at least 5 characters, contain letters, numbers, and one of: $, %, *, @.'
-        }), 400
+        return jsonify({'message': 'Password is too weak. It must be at least 5 characters, contain letters, numbers, and one of: $, %, *, @.'}), 400
 
-    # Check for existing user
     if User.query.filter_by(username=username).first():
         return jsonify({'message': 'Username already exists.'}), 409
 
-    # Create and save new user (default role is 'player')
     try:
         new_user = User(username=username)
         new_user.set_password(password)
@@ -120,7 +114,6 @@ def register():
         return jsonify({'message': 'Database error: Could not register user.'}), 500
 
 
-# Login Route
 @bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -149,7 +142,6 @@ def login():
     }), 200
 
 
-# Logout Route
 @bp.route('/logout', methods=['POST'])
 @login_required
 def logout():
@@ -159,6 +151,32 @@ def logout():
     return jsonify({'message': 'Logged out successfully.'}), 200
 
 # Game API Routes 
+
+# Get Daily Count Route
+@bp.route('/api/game/count', methods=['GET'])
+@login_required 
+def get_daily_count():
+    """Returns the number of words remaining today, including games won."""
+    user_id = session['user_id']
+    today = date.today()
+    
+    games_played_today = get_games_played_today(session['user_id']) # Helper function used earlier
+
+    games_won_today = Game.query.filter(
+        Game.user_id == user_id,
+        Game.date_played == today,
+        Game.status == 'win'
+    ).count()
+    
+    words_left_today = Config.MAX_WORDS_PER_DAY - games_played_today
+    
+    return jsonify({
+        'words_left_today': words_left_today,
+        'games_played': games_played_today,
+        'games_won': games_won_today       
+    }), 200
+
+
 # Start Game Route
 @bp.route('/api/game/start', methods=['POST'])
 @check_daily_limit
@@ -177,13 +195,8 @@ def start_game():
     )
     db.session.add(new_game)
     db.session.commit()
-    
-    user_id = session['user_id']
-    today = date.today()
-    games_played_today = Game.query.filter(
-        Game.user_id == user_id,
-        Game.date_played == today
-    ).count()
+
+    games_played_today = get_games_played_today(session['user_id'])
     
     return jsonify({
         'message': 'Game started.',
@@ -193,8 +206,7 @@ def start_game():
         'status': new_game.status
     }), 200
 
-
-# Submit Guess Route
+# Submit Guess Route 
 @bp.route('/api/game/guess', methods=['POST'])
 @login_required
 def submit_guess():
@@ -202,7 +214,6 @@ def submit_guess():
     game_id = data.get('game_id')
     guessed_word = data.get('guess', '').upper()
 
-    # 1. Retrieve the current game
     game = Game.query.filter_by(id=game_id, user_id=session['user_id']).first()
 
     if not game:
@@ -211,22 +222,18 @@ def submit_guess():
     if game.status != 'in_progress':
         return jsonify({'message': f'Game already concluded with a {game.status}.'}), 400
         
-    # 2. Validate guess word format
     if len(guessed_word) != Config.WORD_LENGTH or not guessed_word.isalpha():
         return jsonify({'message': f'Guess must be a {Config.WORD_LENGTH}-letter word (uppercase only).'}), 400
         
-    # 3. Check guess limit
     current_guess_count = game.guesses.count()
     if current_guess_count >= Config.MAX_GUESSES_PER_WORD:
         game.status = 'loss'
         db.session.commit()
         return jsonify({'message': 'Max guesses reached. Game Over.'}), 400
 
-    # 4. Calculate feedback
     target_word = game.target_word
     feedback_json = calculate_guess_feedback(target_word, guessed_word)
     
-    # 5. Create new Guess entry
     new_guess = Guess(
         game_id=game.id,
         guess_word=guessed_word,
@@ -235,7 +242,6 @@ def submit_guess():
     )
     db.session.add(new_guess)
 
-    # 6. Check for WIN/LOSS condition
     is_win = (guessed_word == target_word)
     is_last_guess = (current_guess_count + 1) == Config.MAX_GUESSES_PER_WORD
     
@@ -253,7 +259,6 @@ def submit_guess():
 
     db.session.commit()
     
-    # 7. Return game state and feedback
     return jsonify({
         'message': message,
         'guess_number': new_guess.guess_number,
@@ -263,15 +268,11 @@ def submit_guess():
         'target_word': target_word_reveal
     }), 200
     
-# Daily Report Route
+# Admin API Routes 
+
 @bp.route('/api/admin/report/daily', methods=['GET'])
 @admin_required
 def daily_report():
-    """
-    Provides a report for a specific day: 
-    (number of users who played, number of correct guesses/wins).
-    Expects 'date' query parameter in YYYY-MM-DD format.
-    """
     report_date_str = request.args.get('date')
     
     if not report_date_str:
@@ -282,12 +283,10 @@ def daily_report():
     except ValueError:
         return jsonify({'message': 'Invalid date format. Use YYYY-MM-DD.'}), 400
 
-    # Number of unique users who played
     unique_users_count = db.session.query(db.func.count(db.func.distinct(Game.user_id))).filter(
         Game.date_played == report_date
     ).scalar()
 
-    # Number of correct guesses (wins)
     correct_guesses_count = Game.query.filter(
         Game.date_played == report_date,
         Game.status == 'win'
@@ -300,14 +299,9 @@ def daily_report():
     }), 200
 
 
-# User Report Route
 @bp.route('/api/admin/report/user/<string:username>', methods=['GET'])
 @admin_required
 def user_report(username):
-    """
-    Provides a report for a specific user: 
-    (date, number of words tried, and number of correct guesses).
-    """
     search_username_lower = username.lower()
     user = User.query.filter(
         db.func.lower(User.username) == search_username_lower
@@ -316,7 +310,6 @@ def user_report(username):
     if not user:
         return jsonify({'message': f'User "{username}" not found.'}), 404
 
-    # Group games by the date played
     daily_stats = db.session.query(
         Game.date_played,
         db.func.count(Game.id).label('words_tried'),
@@ -343,9 +336,6 @@ def user_report(username):
 @bp.route('/api/admin/report/all_users', methods=['GET'])
 @admin_required
 def all_users_report():
-    """
-    Provides statistics for ALL player users (total words tried, total wins).
-    """
     all_stats = db.session.query(
         User.username,
         db.func.count(Game.id).label('total_words_tried'),

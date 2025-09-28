@@ -6,12 +6,14 @@
 
 {% block content %}
 <div class="admin-container" style="max-width: 800px; width: 90%;">
-    <h2>Admin Chamber: LexiQuest Reports</h2>
-    <p>Welcome, Admin {{ session['username'] }}. Analyze the game metrics below.</p>
+    
+    <h2 style="margin-bottom: 15px;">Admin Chamber: LexiQuest Reports</h2>
+    
+    <p style="margin-bottom: 25px;">Welcome, Admin {{ session['username'] }}. Analyze the game metrics below.</p>
 
-    <div style="margin-top: 30px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
+    <div style="margin-top: 40px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
         <h3>Daily Game Summary</h3>
-        <p style="margin-bottom: 10px;">Select a date to view overall game statistics.</p>
+        <p style="margin-top: 10px; margin-bottom: 10px;">Select a date to view overall game statistics.</p>
 
         <form id="daily-report-form">
             <label for="report-date" style="font-weight: bold;">Select Date:</label>
@@ -21,15 +23,23 @@
         </form>
 
         <div id="daily-report-results" style="margin-top: 20px;">
-            <p>Report Date: <span id="daily-date-display" style="font-weight: bold;">--</span></p>
-            <p>Unique Players: <span id="daily-players-count">0</span></p>
-            <p>Total Correct Guesses (Wins): <span id="daily-wins-count">0</span></p>
+            <p style="margin-bottom: 10px;">
+                Report Date: <span id="daily-date-display" style="font-weight: bold;">--</span>
+            </p>
+            
+            <p style="margin-bottom: 10px;">
+                Unique Players: <span id="daily-players-count">0</span>
+            </p>
+            
+            <p>
+                Total Correct Guesses (Wins): <span id="daily-wins-count">0</span>
+            </p>
         </div>
     </div>
 
-    <div style="margin-top: 30px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
-        <h3>Player Performance Tracker (Detailed)</h3>
-        <p style="margin-bottom: 10px;">Enter a player's username to view their history.</p>
+    <div style="margin-top: 50px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
+        <h3>Player Performance Tracker </h3>
+        <p style="margin-top: 10px; margin-bottom: 10px;">Enter a player's username to view their history.</p>
 
         <form id="user-report-form">
             <label for="user-search" style="font-weight: bold;">Username:</label>
@@ -55,9 +65,9 @@
         </div>
     </div>
     
-    <div style="margin-top: 30px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
+    <div style="margin-top: 50px; border: 1px solid var(--color-light-grey); padding: 20px; border-radius: 5px;">
         <h3>Global Player Rankings</h3>
-        <p style="margin-bottom: 15px;">View total performance metrics for all players.</p>
+        <p style="margin-top: 10px; margin-bottom: 10px;">View total performance metrics for all players.</p>
 
         <button id="all-users-report-button" class="btn btn-primary">Generate All Player Report</button>
         

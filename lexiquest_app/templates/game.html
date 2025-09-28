@@ -6,27 +6,36 @@
 
 {% block content %}
 <div class="game-container">
-    <h2>The Deciphering Chamber</h2>
+    
+    <h2 class="chamber-title">The Deciphering Chamber</h2>
 
-    <div id="game-info" style="margin-bottom: 20px;">
-        <p id="current-user">Player: {{ session['username'] }}</p>
-        <p id="game-status-message" style="font-weight: bold; color: var(--color-dark-wood); min-height: 20px;">
+    <div id="game-info" style="margin-bottom: 30px;"> 
+        <p id="current-user" class="player-line">Player: {{ session['username'] }}</p>
+        <p id="game-status-message" class="game-status-line" style="font-weight: bold; color: var(--color-dark-wood); min-height: 10px;">
             Ready to start your quest.
         </p>
     </div>
 
-    <div id="game-start-area">
-        <button id="start-game-button" class="btn btn-primary">Start New Quest (Word)</button>
+    <div id="daily-status-display">
         <p style="margin-top: 10px; font-size: 0.9em;">You can guess a maximum of 3 words per day.</p>
-        <p style="margin-top: 10px; font-size: 0.9em;">
+        <p style="margin-top: 5px; font-size: 0.9em;">
             You have <span id="daily-words-left">3</span> words remaining today.
         </p>
     </div>
 
+    <div id="game-start-area" style="margin-top: 15px;"> 
+        <button id="start-game-button" class="btn btn-primary">Start New Quest (Word)</button>
+    </div>
+    
+    <div id="game-end-controls" style="margin-top: 20px; display: none;">
+        <button id="play-again-button" class="btn btn-primary">Play Another Word</button>
+    </div>
+
+
     <div id="active-game-area" style="display: none;">
         
         <div id="word-grid-display" class="word-grid">
-            </div>
+        </div>
 
         <form id="guess-form" style="margin-top: 30px;">
             <input type="text" 
@@ -43,9 +52,5 @@
         </p>
     </div>
     
-    <div id="game-end-controls" style="margin-top: 20px; display: none;">
-        <button id="play-again-button" class="btn btn-primary">Play Another Word</button>
-    </div>
-
 </div>
 {% endblock %}

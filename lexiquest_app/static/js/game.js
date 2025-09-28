@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameStatusMessage = document.getElementById('game-status-message');
     const guessesCountSpan = document.getElementById('guesses-count');
     const dailyWordsLeftSpan = document.getElementById('daily-words-left'); 
+    const dailyStatusDisplay = document.getElementById('daily-status-display'); // Status lines container
     
     // Game State variables
     let currentGameId = null;
@@ -29,22 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper Function for API Calls 
     async function apiFetch(url, method = 'GET', body = null) {
         try {
-            const options = {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-            };
-            if (body) {
-                options.body = JSON.stringify(body);
-            }
+            const options = { method: method, headers: { 'Content-Type': 'application/json' }, };
+            if (body) options.body = JSON.stringify(body);
             const response = await fetch(url, options);
             const data = await response.json();
             
             if (!response.ok) {
                 displayGameMessage(`Error: ${data.message}`, 'red');
-                if (response.status === 401 || response.status === 403) {
+                if (response.status === 401) { setTimeout(() => window.location.href = '/', 2000); } 
+                else if (response.status === 403 && url.includes('/start')) {
                     updateDailyWordCount(0); 
-                    gameStartArea.style.display = 'block';
+                    gameStartArea.style.display = 'block'; 
+                    dailyStatusDisplay.style.display = 'block'; 
                     activeGameArea.style.display = 'none';
+                    gameEndControls.style.display = 'none';
                 }
                 return null;
             }
@@ -76,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderGuess(guessNumber, feedback) {
         const row = document.getElementById(`row-${guessNumber}`);
         if (!row || !feedback || feedback.length !== WORD_LENGTH) return;
-
         feedback.forEach((item, index) => {
             const tile = row.children[index];
             tile.textContent = item.l;
@@ -84,19 +82,73 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Update Daily Word Count
-    function updateDailyWordCount(count) {
+    function renderScoreDisplay(gamesPlayed, gamesWon, isLimitReached) {
+        let scoreElement = dailyStatusDisplay.querySelector('.daily-score');
+        
+        if (!isLimitReached) {
+            if (scoreElement) scoreElement.remove();
+            return;
+        }
+
+        if (!scoreElement) {
+            scoreElement = document.createElement('p');
+            scoreElement.classList.add('daily-score');
+            dailyStatusDisplay.parentNode.insertBefore(scoreElement, dailyStatusDisplay.nextSibling);
+        }
+
+        scoreElement.style.cssText = 'margin-top: 15px; font-size: 1.1em; font-weight: bold; color: var(--color-dark-wood);';
+        scoreElement.innerHTML = `Score: ${gamesWon}/${gamesPlayed}`;
+    }
+
+
+    // Update Daily Word Count 
+    function updateDailyWordCount(count, gamesPlayed = 0, gamesWon = 0) {
         if (dailyWordsLeftSpan) {
             dailyWordsLeftSpan.textContent = count;
             
-            if (count <= 0) {
+            if (count <= 0 && !currentGameId) {
+                renderScoreDisplay(gamesPlayed, gamesWon, true);
+
                 startGameButton.disabled = true;
                 playAgainButton.disabled = true;
-                displayGameMessage(`You have played all words for today!`, 'red');
+                
+                displayGameMessage(
+                    "You have completed your daily adventures! Come back tomorrow for a new quest.",
+                    'var(--color-dark-wood)'
+                );
             } else {
+                renderScoreDisplay(0, 0, false); 
                 startGameButton.disabled = false;
                 playAgainButton.disabled = false;
+                if (!currentGameId) {
+                    displayGameMessage('Ready to start your quest.');
+                }
             }
+        }
+    }
+
+    // Get Initial Status
+    async function getInitialStatus() {
+        const data = await apiFetch('/api/game/count', 'GET'); 
+        
+        if (data) {
+            updateDailyWordCount(data.words_left_today, data.games_played, data.games_won); 
+            
+            dailyStatusDisplay.style.display = 'block';
+
+            if (data.words_left_today < 3 && data.words_left_today > 0) {
+                gameStartArea.style.display = 'none';
+                gameEndControls.style.display = 'block';
+            } else if (data.words_left_today === 3) {
+                gameStartArea.style.display = 'block';
+                gameEndControls.style.display = 'none';
+            } else {
+                gameStartArea.style.display = 'none';
+                gameEndControls.style.display = 'none';
+            }
+
+        } else {
+            startGameButton.disabled = false;
         }
     }
 
@@ -106,6 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
         currentGameId = data.game_id;
         currentGuessNumber = 0;
         
+        dailyStatusDisplay.style.display = 'none'; 
+
         gameStartArea.style.display = 'none';
         gameEndControls.style.display = 'none';
         activeGameArea.style.display = 'block';
@@ -116,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guessInput.disabled = false;
         submitGuessButton.disabled = false;
 
-        updateDailyWordCount(data.words_left_today); 
+        updateDailyWordCount(data.words_left_today, data.games_played, data.games_won); 
         
         guessesCountSpan.textContent = MAX_GUESSES;
         displayGameMessage('The quest has begun. Submit your first guess!');
@@ -132,12 +186,31 @@ document.addEventListener('DOMContentLoaded', () => {
             displayGameMessage(message, 'red');
         }
 
-        gameEndControls.style.display = 'block';
         currentGameId = null; 
+
+        setTimeout(() => {
+            
+            apiFetch('/api/game/count', 'GET').then(data => {
+                if (data) {
+                    updateDailyWordCount(data.words_left_today, data.games_played, data.games_won);
+                    
+                    dailyStatusDisplay.style.display = 'block';
+                    activeGameArea.style.display = 'none'; 
+                    
+                    if (data.words_left_today > 0) {
+                        gameEndControls.style.display = 'block'; 
+                        gameStartArea.style.display = 'none'; 
+                    } else {
+                        gameEndControls.style.display = 'none';
+                        gameStartArea.style.display = 'none'; 
+                    }
+                } 
+            });
+
+        }, 3000);
     }
 
     // Event Handlers 
-
     startGameButton.addEventListener('click', async () => {
         const data = await apiFetch('/api/game/start', 'POST');
         if (data) {
@@ -149,10 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await apiFetch('/api/game/start', 'POST');
         if (data) {
             initializeGame(data); 
-        } else {
-            gameEndControls.style.display = 'none';
-            gameStartArea.style.display = 'block';
-        }
+        } 
     });
 
     guessForm.addEventListener('submit', async (e) => {
@@ -178,21 +248,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         if (data) {
-            if (data.game_status === 'in_progress') {
-                submitGuessButton.disabled = false;
-            }
-            
             currentGuessNumber = data.guess_number;
             renderGuess(data.guess_number, data.feedback);
             
             guessInput.value = '';
             guessInput.focus();
-
             guessesCountSpan.textContent = data.guesses_remaining;
 
             if (data.game_status !== 'in_progress') {
                 endGame(data.game_status, data.message, data.target_word);
             } else {
+                submitGuessButton.disabled = false;
                 displayGameMessage(data.message);
             }
         }
@@ -205,4 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitGuessButton.disabled = guessInput.value.length !== WORD_LENGTH;
         });
     }
+
+    getInitialStatus();
 });

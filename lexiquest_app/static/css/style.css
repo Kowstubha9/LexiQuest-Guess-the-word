@@ -142,7 +142,7 @@ input[type="text"], input[type="password"] {
     display: grid;
     grid-template-rows: repeat(var(--guess-limit), 1fr);
     gap: 5px;
-    width: calc(var(--word-length) * 55px + 4 * 5px); /* Calculate grid width */
+    width: calc(var(--word-length) * 55px + 4 * 5px); 
     margin: 20px auto;
 }
 
@@ -180,4 +180,27 @@ input[type="text"], input[type="password"] {
     background-color: var(--color-grey);
     border-color: var(--color-grey);
     color: white;
+}
+
+.chamber-title {
+    margin-bottom: 15px; 
+}
+
+.player-line {
+    margin-bottom: 10px; 
+    font-size: 1.1em;
+}
+
+.game-status-line {
+    margin-bottom: 5px; 
+}
+
+#game-start-area {
+    margin-top: 5px; 
+}
+
+#start-game-button {
+    margin-top: 10px; 
+    margin-top: 5px; 
+    margin-bottom: 15px; 
 }

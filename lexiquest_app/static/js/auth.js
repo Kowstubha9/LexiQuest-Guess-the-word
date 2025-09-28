@@ -61,8 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     displayMessage(data.message, 'success');
-                    registerSection.style.display = 'none';
-                    loginSection.style.display = 'block';
+                    setTimeout(() => {
+                        registerSection.style.display = 'none';
+                        loginSection.style.display = 'block';
+                        displayMessage(''); 
+                    }, 500); 
                 } else {
                     displayMessage(data.message);
                 }
